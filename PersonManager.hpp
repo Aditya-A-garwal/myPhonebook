@@ -12,22 +12,17 @@ class PersonManager {
 		
 				PersonManager		();					
 				~PersonManager		();
-		
-		//void	addPerson			(char *, char *);
+				
 		void	addPerson			(char *, char *, char *);		
 		void	delPerson			(char *);
 		
 		void	loadPerson			();
 		void	savePerson			();
 			
-		bool	checkPerson			(char * );
-		
-		void	setIterPos			(int);
-		Person* nextPerson			(Person* p) {return p->nextPerson;}				
-		Person* nextPerson			() 			{return head;}
+		Person*	checkPerson			(char * );			
 		
 		void 	swapPerson			(int, int);
-		void findPerson			(char *);
+		void 	findPerson			(char *);
 			
 		Person* getHead				() 			{return head;}
 		

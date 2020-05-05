@@ -5,28 +5,13 @@ using namespace std;
 Person::Person() {
 	nextPerson = NULL;
 	prevPerson = NULL;
+	
+	vName = "";
+	vNumber = "";
 }
 
 Person::~Person(){
 	
-}
-
-string Person::getName() {
-	return vName;
-}
-	
-void Person::setName(char * aName) {
-	vName.erase(0, vName.length()-1);
-	vName.append(aName);
-}
-	
-string Person::getNum() {
-	return vNumber;
-}
-		
-void Person::setNum(char * aNum) {
-	vNumber.erase(0, vNumber.length()-1);
-	vNumber.append(aNum);
 }
 
 void Person::setBirthday(char * date) {
@@ -50,10 +35,20 @@ void Person::setBirthday(char * date) {
 	vBirthday.year = atoi(y);
 }
 
-void Person::setPerson(Person* aP) {
-	//p = aP;
+bool Person::checkNum (char * aNum) {
+	if(strlen(aNum) != 10) return 1;
+	for(int i = 0; i < 10; i++) {
+		if (!(aNum[i] >= '0' && aNum[i] <= '9')) return 1;
+	}
+	return 0;
 }
 
-Person* Person::getPerson() {
-	return this;
+bool Person::checkDate (char * aDate) {
+	if(strlen(aDate) != 10) return 1;
+	for(int i = 0; i < 10; i++) {
+		if(i == 2 || i == 5) i++;
+		if (!(aDate[i] >= '0' && aDate[i] <= '9')) return 1;
+	}
+	return 0;
 }
+

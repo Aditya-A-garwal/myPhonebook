@@ -4,14 +4,15 @@
 using namespace std;
 
 PersonManager::PersonManager() {
-	head = NULL;
-	tail = NULL;			
+	head = NULL; 
+	tail = NULL; 			
 }
 
 PersonManager::~PersonManager() {
 	Person* p = head;
+	
 	while(p != NULL) {
-		Person* q = p->nextPerson;				
+		Person* q = p->getNext();				
 		delete p;	
 		p = q;			
 	}
@@ -19,6 +20,7 @@ PersonManager::~PersonManager() {
 
 void PersonManager::addPerson (char * pName, char * pNumber, char * pBirthday) {
 	
+	// inits
 	Person* p;
 	Person* next;
 	Person* prev;
@@ -54,7 +56,7 @@ void PersonManager::addPerson (char * pName, char * pNumber, char * pBirthday) {
 			break;
 		
 		// not yet, move to next person
-		next = next->nextPerson;
+		next = next->getNext();
 	}
 		
 	// case: no person in list is greater than input, we have to add at end
@@ -64,8 +66,8 @@ void PersonManager::addPerson (char * pName, char * pNumber, char * pBirthday) {
 		DBG_MSG(cout << "add person at end" << endl);
 		
 		// attach the person as the new tail
-		tail->nextPerson = p;
-		p->prevPerson = tail;
+		tail->setNext(p);
+		p->setPrev(tail);
 		tail = p;
 	}		
 	
@@ -76,14 +78,14 @@ void PersonManager::addPerson (char * pName, char * pNumber, char * pBirthday) {
 		DBG_MSG(cout << "add person before " << next->getName() << endl);
 		
 		// get the previous person to attach to 
-		prev = next->prevPerson;
+		prev = next->getPrev();
 		
 		// case: we are to become the head to an existing list
 		if( prev == NULL) {
 			
 			// attach the person as the new head
-			next->prevPerson = p;
-			p->nextPerson = next;
+			next->setPrev(p);
+			p->setNext(next);
 			head = p;
 	
 		}
@@ -91,12 +93,12 @@ void PersonManager::addPerson (char * pName, char * pNumber, char * pBirthday) {
 		else {
 		
 			// make the linkage to the previous person
-			prev->nextPerson = p;
-			p->prevPerson = prev;
+			prev->setNext(p);
+			p->setPrev(prev);
 		
 			// make the linkage to the next person	
-			next->prevPerson = p;
-			p->nextPerson = next;
+			next->setPrev(p);
+			p->setNext(next);
 		}
 		
 	}
@@ -105,50 +107,63 @@ void PersonManager::addPerson (char * pName, char * pNumber, char * pBirthday) {
 
 void PersonManager::delPerson(char* name) {
 	
+	//inits
 	Person* p;
 	Person* prev;
 	Person* next;
 	
+	//prepare for navigating the list
 	p = head;	
 	
+	//create string from char* for comparison
 	string str(name);
 	
 	while(p != NULL) {		
-		if(str.compare(p->getName()) == 0) break;
-		p = p->nextPerson;
+		if(str.compare(p->getName()) == 0) break; // if found then break the loop
+		p = p->getNext();
 	}
 	
-	if(p == NULL) 
-		return;
+	if(p == NULL) return; // if not found then return from function		
 			
-	prev = p->prevPerson;
-	next = p->nextPerson;				
+	// get next and previous for de-linking
+	prev = p->getPrev();
+	next = p->getNext();				
 				
 	if(p == head)
 		head = next;		
 	
 	else if(p != head) 
-		prev->nextPerson = next;	
+		prev->setNext(next);
 	
 	if(p == tail)	
 		tail = prev; 
 	
 	else if(p != tail) 
-		next->prevPerson = prev; 	
+		next->setPrev(prev);	
 		
 	delete p;		
 }
 
 void PersonManager::loadPerson() {	
 
-	ifstream f;
-	f.open ("phoneInfo.txt");		
+	//intis
+	int		which;
+	char*	number;
+	char*	date;	
+
+	string	name;	
 	
-	string name;
-	string number;
-	string date;	
+	ifstream f;		
 	
-	int which;
+	Person temp;
+	
+	//declarations
+	number = new char[11];
+	date = new char[11]; 	
+	
+	f.open ("phoneInfo.txt", ifstream::in);		
+		
+	if (!(f.is_open())) return;	
 	
 	while(f.eof() == 0) {		
 		string line;			
@@ -157,8 +172,8 @@ void PersonManager::loadPerson() {
 		stringstream st(line);			
 		
 		name = "";
-		number = "";	
-		date = "";
+		strcpy(number, "");	
+		strcpy(date, "");
 	
 		which = 1;
 		
@@ -166,17 +181,25 @@ void PersonManager::loadPerson() {
 			string str;
 			st >> str;
 		
-			if(str.compare(",") == 0) which++;							
+			if(str.compare(",") == 0 && name.compare("") != 0) which++;							
 			else {
 				if(which == 1) name.append(" ").append(str);
-				else if(which == 2) number = str;
-				else if(which == 3) date = str;				
+				else if(which == 2) strcpy(number, str.c_str());	
+				else if(which == 3) strcpy(date, str.c_str());				
 			}							
 		}
 		
-		if(which != 1) addPerson((char *)((name.substr(1)).c_str()), (char *)(number.c_str()), (char *)(date.c_str()));											
+		if(which != 1) {
+			if(temp.checkNum(number) == 0 && temp.checkDate(date) == 0) 
+				addPerson((char *)(name.substr(1).c_str()), number, date);											
+			else 
+				cout << "found corrupted contact with name " << name << endl;
+		}
 	}
 	f.close();	
+	
+	delete number;
+	delete date;
 }
 
 void PersonManager::savePerson() {
@@ -201,7 +224,10 @@ void PersonManager::savePerson() {
 		f << ",";
 		f << setfill('0') << setw(4) << year << endl;
 		
-		currPerson = currPerson->nextPerson;
+		currPerson = currPerson->getNext();
+		
+		DBG_MSG(cout << "waiting 2500" << endl);
+		DBG_MSG(Sleep(2500));		
 	}		
 	f.close();
 }
@@ -226,27 +252,30 @@ void PersonManager::findPerson(char* pName) {
 		for( int i = 0; i < len2; i++) {
 			if(str1.at(0) == str2.at(i)) {
 				if(str1.compare(str2.substr(i, len1)) == 0) {
-					cout << "Name: " << p->getName() << " Number: " << p->getNum() << " Birthday: " << p->getDay() << "/" << p->getMonth() << "/" << p->getYear() << endl;		
+					cout << "Name: " << p->getName() << " Number: " << p->getNum() << " Birthday: " << p->getDay() << "/" << p->getMonth() << "/" << p->getYear() << endl;																									
+					break;
 				}
 			}
 		}					
-		p=p->nextPerson;
+		p=p->getNext();
 	}
 
 	
 }
 
-bool PersonManager::checkPerson(char* check) {
+Person* PersonManager::checkPerson(char* check) {
+		
+	Person* p;
 	
 	string str(check);
 	
-	Person* p = head; 
+	p = head; 
 						
 	while(p != NULL) {		
-		if(str.compare(p->getName()) == 0) return 1;	
-		p = nextPerson(p);
+		if(str.compare(p->getName()) == 0) return p;	
+		p = p->getNext();		
 	}	
-	return 0;
+	return NULL;
 }
 
 void PersonManager::swapPerson(int pos1, int pos2) {
@@ -255,35 +284,35 @@ void PersonManager::swapPerson(int pos1, int pos2) {
 	Person* pBuff = NULL;		
 	
 	if(pos1 != -1) {
-		for(int i = 0; i < pos1; i++) b=b->nextPerson;
+		for(int i = 0; i < pos1; i++) b=b->getNext();
 	} 
 	else { b = tail; }
 	
 	if(pos2 != -1) {
-		for(int i = 0; i < pos2; i++) y=y->nextPerson;					
+		for(int i = 0; i < pos2; i++) y=y->getNext();					
 	}
 	else { y = tail; }
 	
 			
-	Person* a = b->prevPerson;
-	Person* c = b->nextPerson;
+	Person* a = b->getPrev();
+	Person* c = b->getNext();
 	
-	Person* x = y->prevPerson;
-	Person* z = y->nextPerson;				
+	Person* x = y->getPrev();
+	Person* z = y->getNext();				
 	
-	if(a != NULL) a->nextPerson = y; else head = y;
-	if(c != NULL) c->prevPerson = y; else tail = y;	
+	if(a != NULL) a->setNext(y); else head = y;
+	if(c != NULL) c->setPrev(y); else tail = y;	
 	
-	if(x != NULL) x->nextPerson = b; else head = b;
-	if(z != NULL) z->prevPerson = b; else tail = b;		
+	if(x != NULL) x->setNext(b); else head = b;
+	if(z != NULL) z->setPrev(b); else tail = b;		
 	
-	pBuff = b->prevPerson;	
-	b->prevPerson = y->prevPerson;
-	y->prevPerson = pBuff;	
+	pBuff = b->getPrev();	
+	b->setPrev(y->getPrev());
+	y->setPrev(pBuff);
 	
-	pBuff = b->nextPerson;
-	b->nextPerson = y->nextPerson;
-	y->nextPerson = pBuff;
+	pBuff = b->getNext();
+	b->setNext(y->getNext());
+	y->setNext(pBuff);
 		
 }
 

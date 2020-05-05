@@ -1,11 +1,12 @@
 #include <iostream>
+#include <windows.h>
 
 using namespace std;
 
 //#define PB_DEBUG	1
 
 #ifdef PB_DEBUG
-	#define DBG_MSG(x)	x
+		#define DBG_MSG(x)	x
 #else 
 		#define DBG_MSG(x) 
 #endif	
@@ -23,30 +24,31 @@ class Person {
 				Person		();					
 				~Person		();
 		
-		string 	getName		();		
-		void 	setName		(char *);
+		string 	getName		()						{return vName;}		
+		void 	setName		(char * aName) 			{vName.append(aName);}
 		
-		string 	getNum		();		
-		void 	setNum		(char *);	
-		
-		//string getBirthday	();
-		void setBirthday	(char *);
-		
-		void 	setPerson	(Person*);			
-		Person* getPerson	();		
+		string 	getNum		()						{return vNumber;}		
+		void 	setNum		(char * aNum) 			{vNumber.append(aNum);}		
+				
+		void setBirthday	(char *);		
 
-		void setDay			(short d) {vBirthday.day = d;}
-		void setMonth		(short m) {vBirthday.month = m;}
-		void setYear		(short y) {vBirthday.year = y;}
+		long	getDay		() 						{return vBirthday.day;}
+		long	getMonth	() 						{return vBirthday.month;}
+		long	getYear		() 						{return vBirthday.year;}
+		
+		Person* getNext		()						{return nextPerson;}
+		Person* getPrev		()						{return prevPerson;}					
 
-		long	getDay		() 			{return vBirthday.day;}
-		long	getMonth	() 			{return vBirthday.month;}
-		long	getYear		() 			{return vBirthday.year;}
-	
-		Person* nextPerson;		
-		Person* prevPerson;					
+		void setNext		(Person * pNextPerson)	{nextPerson = pNextPerson;}
+		void setPrev		(Person * pPrevPerson)	{prevPerson = pPrevPerson;}	
+		
+		bool checkNum		(char *);
+		bool checkDate		(char *);
 		
 	private:	
+	
+		Person* nextPerson;		
+		Person* prevPerson;	
 				
 		string 	vName;		
 		string 	vNumber;	
