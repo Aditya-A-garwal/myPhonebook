@@ -1,0 +1,39 @@
+#include "Person.hpp"
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <iomanip>
+
+using namespace std;
+
+class PersonManager {
+	
+	public:		
+		
+				PersonManager		();					
+				~PersonManager		();
+		
+		//void	addPerson			(char *, char *);
+		void	addPerson			(char *, char *, char *);		
+		void	delPerson			(char *);
+		
+		void	loadPerson			();
+		void	savePerson			();
+			
+		bool	checkPerson			(char * );
+		
+		void	setIterPos			(int);
+		Person* nextPerson			(Person* p) {return p->nextPerson;}				
+		Person* nextPerson			() 			{return head;}
+		
+		void 	swapPerson			(int, int);
+		void findPerson			(char *);
+			
+		Person* getHead				() 			{return head;}
+		
+	private:		
+				
+		Person* head;
+		Person* tail;
+		
+};
