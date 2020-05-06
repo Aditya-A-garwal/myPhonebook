@@ -142,7 +142,7 @@ int main(int argc, char* argv[]) {
 				cout << "\n" << "invalid date format" << "\n" << endl;
 				goto redate2;
 			}					
-			
+					
 			modif->setNum(numberBuff);
 			modif->setBirthday(birthdayBuff);
 			

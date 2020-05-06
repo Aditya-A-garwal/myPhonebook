@@ -28,7 +28,7 @@ class Person {
 		void 	setName		(char * aName) 			{vName.append(aName);}
 		
 		string 	getNum		()						{return vNumber;}		
-		void 	setNum		(char * aNum) 			{vNumber.append(aNum);}		
+		void 	setNum		(char *);		
 				
 		void setBirthday	(char *);		
 

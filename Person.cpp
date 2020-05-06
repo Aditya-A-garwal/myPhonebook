@@ -14,6 +14,11 @@ Person::~Person(){
 	
 }
 
+void Person::setNum(char * aNum) {
+	vNumber.clear();
+	vNumber.append(aNum);
+}		
+
 void Person::setBirthday(char * date) {
 	char d[3];
 	char m[3];
@@ -21,7 +26,7 @@ void Person::setBirthday(char * date) {
 		
 	d[0] = date[0];				
 	d[1] = date[1];
-		
+
 	m[0] = date[3];				
 	m[1] = date[4];
 	
