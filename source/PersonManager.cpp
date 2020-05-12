@@ -161,6 +161,11 @@ void PersonManager::loadPerson() {
 	number = new char[11];
 	date = new char[11]; 	
 	
+	f.open ("phoneInfo.txt", ifstream::binary);		
+	f.seekg(0, f.end);
+	cout << "Length of file is: " << f.tellg() << endl;
+	f.close();
+	
 	f.open ("phoneInfo.txt", ifstream::in);		
 		
 	if (!(f.is_open())) return;	
